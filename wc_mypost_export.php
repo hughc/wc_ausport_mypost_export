@@ -288,9 +288,11 @@ class MyPostExportFields
 	    foreach( $order->get_items() as $item_id => $product_item ){
 	        $quantity = $product_item->get_quantity(); // get quantity
 	        $product = $product_item->get_product(); // get the WC_Product object
-	        $product_weight = $product->get_weight(); // get the product weight
+	        if($product) {
+            $product_weight = $product->get_weight(); // get the product weight
+            $total_weight += floatval( $product_weight * $quantity );
+          }
 	        // Add the line item weight to the total weight calculation
-	        $total_weight += floatval( $product_weight * $quantity );
 	    }
 
 	    return $total_weight;

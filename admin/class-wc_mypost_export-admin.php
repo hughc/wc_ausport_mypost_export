@@ -52,8 +52,38 @@ class Wc_mypost_export_Admin {
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
 
+		//	add_action( 'woocommerce_admin_order_actions_end', array( $this, 'add_listing_actions' ) );
+
+
 	}
 
+
+/**
+	 * Add PDF actions to the orders listing
+	 */
+	public function add_listing_actions( $order ) {
+		// do not show buttons for trashed orders
+		if ( $order->get_status() == 'trash' ) {
+			return;
+		}
+
+		$listing_actions = array();
+		$listing_actions['mypost_export'] = array(
+			'url'		=> wp_nonce_url( admin_url( "admin-ajax.php?action=generate_mypost_export&order_ids=" . WCX_Order::get_id( $order ) ), 'generate_mypost_export' ),
+			'alt'		=> "PDF " . $document->get_title(),
+			'img'		=> ""
+		);
+
+		$listing_actions = apply_filters( 'wpo_wcpdf_listing_actions', $listing_actions, $order );			
+
+		foreach ($listing_actions as $action => $data) {
+			?>
+			<a href="<?php echo $data['url']; ?>" class="button tips wpo_wcpdf <?php echo $action; ?>" target="_blank" alt="<?php echo $data['alt']; ?>" data-tip="<?php echo $data['alt']; ?>">
+				<img src="<?php echo $data['img']; ?>" alt="<?php echo $data['alt']; ?>" width="16">
+			</a>
+			<?php
+		}
+	}
 	/**
 	 * Register the stylesheets for the admin area.
 	 *
